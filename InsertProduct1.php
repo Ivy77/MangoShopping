@@ -33,6 +33,9 @@
             <li>
                 <a href="InsertCategory.php">Insert New Category</a>
             </li>
+            <li>
+                <a href="Orders.php">View Orders</a>
+            </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li><a href="Logout.php">Log out</a></li>
@@ -103,16 +106,25 @@ if(isset($_POST['submit'])){
     $ProductID = mysqli_insert_id($db);
     
     
-    if ($_FILES['picture']['size']>0){
-     //if there is a picture
-     
+    if ($_FILES['Picture']['size']>0){
+     //if there is a Picture
+     echo "there's a picture";
+     echo '<br>';
+     echo $_FILES;
+     echo '<br>';
      //copy image to images directory
-     $tmpName = $_FILES['picture']['tmp_name'];
-     $fileName = $_FILES['picture']['name'];
-     $newFileName = $imageDir.$ProductID.$fileName;
+     $tmpName = $_FILES['Picture']['tmp_name'];
+     echo $tmpName;
+     $fileName = $_FILES['Picture']['name'];
+     echo '<br>';
+     echo $fileName;
+     echo($_FILES['Picture']);
+     $newFileName = $imagesDir.$ProductID.$fileName;
+     echo '<br>';
+     echo $newFileName;
      if(move_uploaded_file($tmpName,$newFileName)){
         //since we successfully copied the file, we now enter its filename in the Products table
-        $query = "UPDATE Products SET Picture = '$newFileName' WHERE id = $ProductID;";
+        $query = "UPDATE Products SET Picture = '$newFileName' WHERE ProductID = $ProductID;";
         
         //run insert query
         queryDB($query,$db);
@@ -128,7 +140,6 @@ if(isset($_POST['submit'])){
     
     
     }
-
 }       
 ?>    
     
@@ -226,16 +237,20 @@ if(isset($_POST['submit'])){
     <input type= "text" class="form-control" name="Unit"  value="<?php if($Unit){echo $Unit;} ?>"></input>
 </div>
 
-<!--picture-->
+<!--Picture-->
 <div class="form-group">
     <label for="Picture">Picture of Product</label>
-    <input type='file' class="form-control" name="picture"/>
+    <input type='file' class="form-control" name="Picture"/>
 </div>
 
 <button type="submit" class="btn btn-default" name = "submit">Save</button>
                 </form>
             </div>
         </div>
+
+
+
+
 
 
 <!--Show contents of product table-->
@@ -269,7 +284,7 @@ if(isset($_POST['submit'])){
     
     // set up a query to get info on the products from the database
     //$query = "SELECT * FROM Products;";
-    $query = 'SELECT Products.ProductID,Products.ProductName, Category.CategoryName as Category, ProductDescription, UnitPrice, UnitCost, Unit FROM Products, Category WHERE Products.CategoryID = Category.CategoryID;';
+    $query = 'SELECT Products.ProductID,Products.ProductName, Category.CategoryName as Category, ProductDescription, UnitPrice, UnitCost, Unit, Picture FROM Products, Category WHERE Products.CategoryID = Category.CategoryID;';
     //run the query
     //queryDB is a function from dbutils file
     $result = queryDB($query,$db);
@@ -287,9 +302,9 @@ if(isset($_POST['submit'])){
         echo "<td>".$row["Unit"]."</td>";
         echo "</tr> \n";
         
-        // picture
+        // Picture
         echo "<td>";
-        if($row['picture']){
+        if($row['Picture']){
             $imageLocation = $row['Picture'];
             $altText = 'Products'.$row['ProductName'];
             echo "<img src='$imageLocation' width='150' alt='altText'>";
@@ -297,6 +312,9 @@ if(isset($_POST['submit'])){
         echo "</td>";
         
         // link to update record (Products)
+        echo "<td><a href='UpdateProduct.php?ProductID = " . $row['ProductID'] . "'>update</a></td>";
+        
+        // link to delete record
         echo "<td><a href='DeleteProduct.php?ProductID=" . $row['ProductID'] . "'>delete</a></td>";
         
         echo "</tr> \n";
