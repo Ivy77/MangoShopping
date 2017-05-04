@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS Products;
 DROP TABLE IF EXISTS Category;
 DROP TABLE IF EXISTS Orders;
 DROP TABLE IF EXISTS Customers;
---SHOULD WE HAVE A VISITOR TABLE?
+-- SHOULD WE HAVE A VISITOR TABLE?
 
 CREATE TABLE Customers(
 	CustomerID INT NOT NULL AUTO_INCREMENT,
@@ -12,23 +12,32 @@ CREATE TABLE Customers(
 	Email VARCHAR(100) NOT NULL,
 	HashedPass VARCHAR(255) NOT NULL,
     Address VARCHAR(100),
-    PhoneNumber INT,
+    PhoneNumber VARCHAR(50),
 	PRIMARY KEY(CustomerID)
 );
 
+INSERT INTO Customers(CustomerName, Email, HashedPass, Address, PhoneNumber)VALUES('Yun Ma','yun-ma@alibaba.com','1234567890', 'Hangzhou, Zhejiang', '88888888');
+
 CREATE TABLE Orders(
-	OrderID INT NOT NULL AUTO_INCREMENT,
+    OrderID INT NOT NULL AUTO_INCREMENT,
     CustomerID INT UNSIGNED NOT NULL,
     OrderDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	Payment INT NOT NULL,   -- amt of money that customer paid
-	HashedPass VARCHAR(255) NOT NULL,
+    Payment INT NOT NULL,   -- amt of money that customer paid
     Address VARCHAR(100) NOT NULL,
     PrefDeliveryDate DATE,
-    SetDeliveryDate DATE NOT NULL,
     ActDeliveryDate DATE,
     Status VARCHAR(50) NOT NULL,
+    -- four deliverty status: received, processed, delivered, returned--
 	PRIMARY KEY(OrderID)
 );
+
+INSERT INTO Orders(CustomerID,Payment,Address,PrefDeliveryDate,Status) VALUES(1,88,'100 University Avenue, Riverside, CA',CURRENT_TIMESTAMP,'Received');
+
+INSERT INTO Orders(CustomerID,Payment,Address,PrefDeliveryDate,Status) VALUES(1,87,'100 University Avenue, Riverside, CA',CURRENT_TIMESTAMP,'Shipped');
+
+INSERT INTO Orders(CustomerID,Payment,Address,PrefDeliveryDate,Status) VALUES(1,89,'100 University Avenue, Riverside, CA',CURRENT_TIMESTAMP,'Delivered');
+
+INSERT INTO Orders(CustomerID,Payment,Address,PrefDeliveryDate,Status) VALUES(1,80,'100 University Avenue, Riverside, CA',CURRENT_TIMESTAMP,'Returned');
 
 CREATE TABLE Category(
     CategoryID INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -62,7 +71,8 @@ CREATE TABLE Administrator(
   Email VARCHAR(100) NOT NULL,
   HashedPass VARCHAR(255) NOT NULL,
   Address VARCHAR(100) NOT NULL,
-  AdminLevel INT NOT NULL,
+  AdminLevel BOOLEAN NOT NULL,
+  -- currently just make this strings "manager" or "staff" and if is manager the True
   PRIMARY KEY(AdID)
 );
 
