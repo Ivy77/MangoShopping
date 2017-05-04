@@ -37,7 +37,7 @@ while($row = mysqli_fetch_array($tab_result))
  {
   $tab_content .= '
   <div class="col-md-3" style="margin-bottom:36px;">
-   <img src="images/'.$sub_row["Picture"].'" class="img-responsive img-thumbnail" />
+   <img src="'.$sub_row["Picture"].'" class="img-responsive img-thumbnail" />
    <h4>'.$sub_row["ProductName"].'</h4>
   </div>
   ';

@@ -1,5 +1,5 @@
 <?php
-//has bug ... fix
+
 
 /*
  * This php file enables users to edit a particular order
@@ -20,14 +20,14 @@
         $OrderID = $_POST['OrderID'];
         if (!isset($OrderID)) {
             // if for some reason the OrderID didn't post, kick them back to Order1.php
-            header('Location: Order1.php');
+            header('Location: OrderFilter.php');
             exit;
         }
 
         // get data from form
         $ActDeliveryDate = $_POST['ActDeliveryDate'];
-        $Status = $_POST['crust'];
-        
+        $Status = $_POST['Status'];
+        $Address = $_POST['Address'];
         // variable to keep track if the form is complete (set to false if there are any issues with data)
         $isComplete = true;
         
@@ -36,11 +36,7 @@
         
         
         // check each of the required variables in the table        
-        if (!isset($ActDeliveryDate)) {
-            // add error handling here .. exception for date form? check out documention on Datetime()
-            $errorMessage .= "Please enter a shape for the pizza.\n";
-            $isComplete = false;
-        }
+       
         
        
         if (!isset($Status)) {
@@ -56,7 +52,7 @@
             // first update order record
             //
             // put together SQL statement to update pizza
-            $query = "UPDATE Orders SET ActDeliveryDate = '$ActDeliveryDate', Status = '$Status' WHERE OrderID=$OrderID;";
+            $query = "UPDATE Orders SET ActDeliveryDate = '$ActDeliveryDate',Address = '$Address', Status = '$Status' WHERE OrderID=$OrderID;";
             
             // connect to the database
             $db = connectDB($DBHost, $DBUser, $DBPasswd, $DBName);
@@ -66,8 +62,8 @@
                     
           
             
-            // now that we are done, send user back to pizza.php and exit 
-            header("Location: Order1.php?successmessage=Successfully updated order $OrderID");
+            // now that we are done, send user back to OrderFilter.php and exit 
+            header("Location: OrderFilter.php?successmessage=Successfully updated order $OrderID");
             exit;
         }        
     } else {
@@ -76,14 +72,15 @@
         //
     
         /*
-         * Check if a GET variable was passed with the id for the pizza
+         * Check if a GET variable was passed with the id for the order
          *
          */
         if(!isset($_GET['OrderID'])) {
             // if the id was not passed through the url
             
             // send them out to Order1.php and stop executing code in this page
-            header('Location: Order1.php');
+            /////////////This was run?????????????????????????!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            header('Location: OrderFilter.php');
             exit;
         }
         
@@ -101,23 +98,23 @@
         // run the query
         $result = queryDB($query, $db);
         
-        // if the id is not in the order table, then we need to send the user back to Order1.php
+        // if the id is not in the order table, then we need to send the user back to OrderFilter.php
         if (nTuples($result) == 0) {
-            // send them out to pizza.php and stop executing code in this page
-            header('Location: Order1.php');
+      
+            header('Location: OrderFilter.php');
             exit;
         }
         
         /*
-         * Now we know we got a valid pizza id through the GET variable
+         * Now we know we got a valid porder id through the GET variable
          */
         
         // get data on pizza to fill out form with existing values
         $row = nextTuple($result);
         
         $ActDeliveryDate = $row['ActDeliveryDate'];
-        $shapeid = $row['Status'];
-        
+        $Status = $row['Status'];
+        $Address = $row['Address'];
     }
 ?>
 
@@ -135,7 +132,7 @@
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>        
         
-        <title>Update order <?php echo $OrderID; ?></title>
+        <title>Update Order <?php echo $OrderID; ?></title>
     </head>
     
     <body>
@@ -143,7 +140,7 @@
 <!-- Title -->
 <div class="row">
     <div class="col-xs-12">
-        <h1>Update order <?php echo $OrderID ?></h1>        
+        <h1>Update Order <?php echo $OrderID ?></h1>        
     </div>
 </div>
 
@@ -170,23 +167,37 @@
 <div class="row">
     <div class="col-xs-12">
         
-        <form action="UpdateOrder.php.php" method="post">
+        <form action="UpdateOrder.php" method="post">
 <!-- Actual Delivery Date -->
 <div class="form-group">
     <label for="ActDeliveryDate">Actual Delivery Date:</label>
     <input type="text" class="form-control" name="ActDeliveryDate" value="<?php if($ActDeliveryDate) { echo $ActDeliveryDate; } ?>"/>
 </div>
 
-<!-- Status -->
+
+<!--Status-->
 <div class="form-group">
     <label for="Status">Order Status: </label>
-    <input type="text" class="form-control" name="Status" value="<?php if($Status) { echo $Status; } ?>"/>
+      <select class='form-control' name='Status'>
+          <option value='Shipped' selected="selected">Shipped</option>
+          <option value='Delivered' selected="selected">Delivered</option>
+          <option value='Retuned' selected="selected">Returned</option>
+          <option value='Received' selected="selected">Received</option>
+    </select>
+    
 </div>
 
 
 
-<!-- hidden id (not visible to user, but need to be part of form submission so we know which pizza we are updating -->
-<input type="hidden name="OrderID" value="<?php echo $OrderID; ?>"/>
+<!-- Address -->
+<div class="form-group">
+    <label for="Address">Delivery Address: </label>
+    <input type="text" class="form-control" name="Address" value="<?php if($Address) { echo $Address; } ?>"/>
+</div>
+
+
+<!-- hidden id (not visible to user, but need to be part of form submission so we know which order we are updating -->
+<input type="hidden" name="OrderID" value="<?php echo $OrderID; ?>"/>
 
 <button type="submit" class="btn btn-default" name="submit">Save</button>
 
