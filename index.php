@@ -377,7 +377,7 @@ function doCheckout() {
 
     if (isset($_SESSION['user'])) {
         $CustomerID = $_SESSION['user']['CustomerID'];
-        $insert = "INSERT INTO Orders(CustomerID, Payment, Address, PrefDeliveryDate, Status) VALUES ('$CustomerID', '$payment', '$address', '$prefDeliveryDate', 'received');";
+        $insert = "INSERT INTO Orders(CustomerID, Payment, Address, PrefDeliveryDate, Status) VALUES ('$CustomerID', '$payment', '$address', '$prefDeliveryDate', 'Received');";
         queryDB($insert, $db);
 
         $ids = queryDB('SELECT LAST_INSERT_ID() id', $db);
@@ -390,7 +390,7 @@ function doCheckout() {
             $product = $item['product'];
             $productID = $product['ProductID'];
             for ($i = 0; $i < $item['num']; $i++) {
-                queryDB("insert into OrderProduct(ProductID, OrderID) values('$productID', '$id')", $db);
+                queryDB("insert into OrderProduct(ProductID, OrderID) values('$productID', '$id');", $db);
             }
         }
     }
