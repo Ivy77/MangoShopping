@@ -7,7 +7,7 @@
                     <li class="media">
                         <div class="media-left">
                             <a href="#">
-                                <img class="media-object" src="<?php echo $imagesDir . $item['Picture']; ?>" width="64" height="64" alt="...">
+                                <img class="media-object" src="<?php echo $item['Picture']; ?>" width="64" height="64" alt="...">
                             </a>
                         </div>
                         <div class="media-body">
