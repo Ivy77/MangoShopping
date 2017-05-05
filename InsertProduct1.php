@@ -1,8 +1,16 @@
-<!-- this file cannot insert a product into the db yet. Probably because cannot be entered-->
+
 
 <!--to do: welcome user-->
 <!--todo: error prevention: duplicate product-->
+<?php
+// this kicks users out if they are not logged in
+    session_start();
+    if (!isset($_SESSION['email'])) {
+        header('Location: Login.php');
+        exit;
+    }
 
+?>
 <!--This file will enable sellers to enter new products, and see existing products in the db-->
 <html>
     <head>
@@ -33,9 +41,8 @@
             <li>
                 <a href="InsertCategory.php">Insert New Category</a>
             </li>
-            <li>
-                <a href="Orders.php">View Orders</a>
-            </li>
+            <li><a href="OrderFilter.php">View Orders</a></li>
+            <li><a href="ViewProduct.php">View Products</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li><a href="Logout.php">Log out</a></li>
@@ -61,7 +68,7 @@ if(isset($_POST['submit'])){
     //get CategoryID selected by user in the dropdown list
     $CategoryID = $_POST['Category-CategoryID'];
     //////////////////////////
-    echo $CategoryID;   
+    //echo $CategoryID;   
 
     /////////////////////////////
     //Variables to keep track if the form is complete 
@@ -74,7 +81,17 @@ if(isset($_POST['submit'])){
     if(!isset($ProductName)){
         $errorMessage.="Please enter a name for the product\n";
         $isComplete = false;
+    }{
+        // check if there's not a product with the same name in the database
+        $db = connectDB($DBHost,$DBUser,$DBPasswd,$DBName);
+        $query = "SELECT ProductName from Products where ProductName = '$ProductName';";
+        $result = queryDB($query,$db);
+        if(nTuples($result)>0){
+            $isComplete = false;
+            $errorMessage .= "The product name $ProductName is used by another product in the database.\n";
+        }
     }
+    
     if(!isset($UnitPrice)){
         $errorMessage.="Please enter the unit price for the product\n";
         $isComplete = false;   
@@ -95,7 +112,7 @@ if(isset($_POST['submit'])){
     if($isComplete){
     
     //insert record SQL
-    $query = "INSERT INTO Products(CategoryID, ProductName, ProductDescription, UnitPrice, UnitCost, Unit) VALUES('$CategoryID','$ProductName','$ProductDescription',$UnitPrice,'$UnitCost','$Unit');";
+    $query = "INSERT INTO Products(CategoryID, ProductName, ProductDescription, UnitPrice, UnitCost, Unit) VALUES($CategoryID,'$ProductName','$ProductDescription',$UnitPrice,$UnitCost,'$Unit');";
     
     //connect to db
     $db = connectDB($DBHost, $DBUser,$DBPasswd,$DBName);
@@ -103,37 +120,41 @@ if(isset($_POST['submit'])){
     //run the insert stmt
     $result = queryDB($query,$db);
     
-    $ProductID = mysqli_insert_id($db);
     
+    $ProductID = mysqli_insert_id($db);
+        
+        
+        
     
     if ($_FILES['Picture']['size']>0){
      //if there is a Picture
-     echo "there's a picture";
-     echo '<br>';
-     echo $_FILES;
-     echo '<br>';
+
+     //echo $_FILES;
+     //echo '<br>';
      //copy image to images directory
      $tmpName = $_FILES['Picture']['tmp_name'];
-     echo $tmpName;
+
      $fileName = $_FILES['Picture']['name'];
-     echo '<br>';
-     echo $fileName;
-     echo($_FILES['Picture']);
+     //echo $fileName;
+     //echo($_FILES['Picture']);
      $newFileName = $imagesDir.$ProductID.$fileName;
-     echo '<br>';
-     echo $newFileName;
+     //echo $newFileName;
      if(move_uploaded_file($tmpName,$newFileName)){
+	
+         //?????????????????????????????why!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //since we successfully copied the file, we now enter its filename in the Products table
         $query = "UPDATE Products SET Picture = '$newFileName' WHERE ProductID = $ProductID;";
-        
+        $db = connectDB($DBHost, $DBUser,$DBPasswd,$DBName);
         //run insert query
         queryDB($query,$db);
      }else{
         echo "error copying image";
+        $result = queryDB($query,$db);
+        var_dump($result);
      }
     }
     
-    $success = ("Successfully entered new product".$ProductName);
+    $success = ("Successfully entered new product " .$ProductName);
     
     // reset values of variables so the form is cleared
     unset($ProductName,$ProductDescription,$UnitPrice,$UnitCost,$Unit,$CategoryID);
@@ -300,7 +321,7 @@ if(isset($_POST['submit'])){
         echo "<td>".$row["UnitPrice"]."</td>";
         echo "<td>".$row["UnitCost"]."</td>";
         echo "<td>".$row["Unit"]."</td>";
-        echo "</tr> \n";
+
         
         // Picture
         echo "<td>";
@@ -312,10 +333,10 @@ if(isset($_POST['submit'])){
         echo "</td>";
         
         // link to update record (Products)
-        echo "<td><a href='UpdateProduct.php?ProductID = " . $row['ProductID'] . "'>update</a></td>";
-        
+        //echo "<td><a href='UpdateProduct.php?ProductID = " . $row['ProductID']  .  "'>update</a></td>";
+        echo "<td><a href='UpdateProduct.php?ProductID=" . $row['ProductID'] . "'>update</a></td>";
         // link to delete record
-        echo "<td><a href='DeleteProduct.php?ProductID=" . $row['ProductID'] . "'>delete</a></td>";
+        echo "<td><a href='DeleteProduct.php?ProductID=" . $row['ProductID']  .  "'>delete</a></td>";
         
         echo "</tr> \n";
     }
