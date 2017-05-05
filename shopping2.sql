@@ -1,0 +1,1 @@
+alter table Products modify UnitPrice float NOT NULL;

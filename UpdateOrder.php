@@ -1,5 +1,13 @@
 <?php
 
+// this kicks users out if they are not logged in
+    session_start();
+    if (!isset($_SESSION['email'])) {
+        header('Location: Login.php');
+        exit;
+    }
+
+
 
 /*
  * This php file enables users to edit a particular order
@@ -181,7 +189,7 @@
       <select class='form-control' name='Status'>
           <option value='Shipped' selected="selected">Shipped</option>
           <option value='Delivered' selected="selected">Delivered</option>
-          <option value='Retuned' selected="selected">Returned</option>
+          <option value='Returned' selected="selected">Returned</option>
           <option value='Received' selected="selected">Received</option>
     </select>
     

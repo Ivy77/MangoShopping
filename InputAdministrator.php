@@ -1,8 +1,28 @@
 <!-- This file provides input capabalities into a table of administators -->
 <!-- It also lists the contents of the table -->
-<!-- It uses bootstrap for formatting -->
-
-
+<?php
+// this kicks users out if they are not logged in or if they are not manager
+// only managers can add administrators!
+    session_start();
+    if (!isset($_SESSION['email'])) {
+        header('Location: Login.php');
+        exit;
+    }else{
+		$email = $_SESSION['email'];
+		include_once('config.php');
+		include_once('dbutils.php');
+		
+		$db = connectDB($DBHost, $DBUser,$DBPasswd,$DBName);
+		$query = "SELECT AdminLevel FROM Administrator WHERE Email = '$email';";
+		$result = queryDB($query,$db);
+		$row = nextTuple($result);
+		if(!$row["AdminLevel"]){
+			header('Location: Login.php');
+			exit;
+		}
+		
+	}
+?>
 <!--todo : catch errors like: duplicate administrator, value error... start session... staff can't see this page and error message-->
 <!--Menu bar-->
 <nav class="navbar navbar-default">
@@ -18,7 +38,10 @@
                 <a href="InsertCategory.php">Insert New Category</a>
             </li>
             <li>
-                <a href="Orders.php">View Orders</a>
+                <a href="OrderFilter.php">View Orders</a>
+            </li>
+			<li>
+                <a href="ViewProduct.php">View Products</a>
             </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -47,7 +70,7 @@
 
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-        
+
     </head>
     
     <body>
@@ -114,7 +137,7 @@ if (isset($_POST['submit'])) {
         $errorMessage .= " Please enter your address.";
         $isComplete = false;
     }
-    if (!$AdminLevel) {
+    if (!isset($AdminLevel)) {
         $errorMessage .= " Please select the administration level for the user.";
         $isComplete = false;
     }
@@ -132,13 +155,13 @@ if (isset($_POST['submit'])) {
 			$Hashedpass = crypt($password, getSalt());
 			
 			// put together sql code to insert tuple or record
-			$insert = "INSERT INTO Administrator(AdminName, Email, Hashedpass, Address, AdminLevel) VALUES ('$AdminName','" . $Email . "', '" . $Hashedpass . "','$Address', '$AdminLevel');";
+			$insert = "INSERT INTO Administrator(AdminName, Email, Hashedpass, Address, AdminLevel) VALUES ('$AdminName','" . $Email . "', '" . $Hashedpass . "','$Address', $AdminLevel);";
 		
 			// run the insert statement
 			$result = queryDB($insert, $db);
 			
 			// we have successfully inserted the record
-			echo ("Successfully entered " . $Email . " into the database.");
+			$success = "Successfully entered " . $Email . " into the database.";
 		} else {
 			$isComplete = false;
 			$errorMessage = "Sorry. We already have a user account under email " . $Email;
@@ -162,6 +185,29 @@ if (isset($_POST['submit'])) {
 ?>            
     </div>
 </div>
+<!-- success -->
+ <div class="row">
+    <div class="col-xs-12">
+<?php
+    if(isset($success)){
+        // for successes after the form was submitted
+        echo '<div class="alert alert-success" role = "alert">';
+        echo($success);
+        echo '</div>';
+    }elseif(isset($_GET['successmessage'])){
+        // for success from another form that redirects users to this page
+        echo '<div class = "alert alert-success" role="alert">';
+        echo($_GET['successmessage']);
+        echo '</div>';
+    }
+
+
+?>
+       
+    </div>    
+ 
+</div>
+        
 
 <!-- form for inputting data -->
         <div class="row">

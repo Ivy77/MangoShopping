@@ -6,7 +6,15 @@
 <?php
     include_once('config.php');
     include_once('dbutils.php');
-    
+
+// this kicks users out if they are not logged in
+    session_start();
+    if (!isset($_SESSION['email'])) {
+        header('Location: Login.php');
+        exit;
+    }
+
+
 ?>
 
 <html>
@@ -20,6 +28,7 @@
             <li><a href="InsertProduct1.php">Insert New Product</a></li>
             <li><a href="InsertCategory.php">Insert New Category</a></li>
             <li class="active"><a href="OrderFilter.php">View Orders</a>
+            <li class="active"><a href="ViewProduct.php">View Products</a>
             </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -64,6 +73,7 @@
             <!--headers for table-->
             <thead>
                 <th>Order ID</th>
+                <th>Order Detail</th>
                 <th>Order Date</th>
                 <th>Payment Value</th>
                 <th>Shipping Address</th>
@@ -99,6 +109,7 @@
     while($row = nextTuple($result)){
         echo "\n <tr>";
         echo "<td>".$row["OrderID"]."</td>";
+        echo "<td><a href='OrderProduct.php?OrderID=" . $row["OrderID"] . "'>View Order</a></td>";
         echo "<td>".$row["OrderDate"]."</td>";
         echo "<td>".$row["Payment"]."</td>";
         echo "<td>".$row["Address"]."</td>";
@@ -112,7 +123,7 @@
         echo "<td><a href='UpdateOrder.php?OrderID=" . $row['OrderID']  .  "'>update</a></td>";
         
         // link to delete record (Actually should remove this because an order shouldn't be deleted....)
-        echo "<td><a href='DeleteOrder.php?OrderID=" . $row['OrderID'] . "'>delete</a></td>";
+        //echo "<td><a href='DeleteOrder.php?OrderID=" . $row['OrderID'] . "'>delete</a></td>";
         
         echo "</tr> \n";
     }

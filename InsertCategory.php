@@ -1,3 +1,13 @@
+<?php
+// this kicks users out if they are not logged in
+    session_start();
+    if (!isset($_SESSION['email'])) {
+        header('Location: Login.php');
+        exit;
+    }
+
+?>
+
 <html>
 
 <!--see if there is need to add a function to delete category-->
@@ -31,6 +41,7 @@
             <li><a href="InsertProduct1.php">Insert New Product</a></li>
             <li class="active"><a href="InsertCategory.php">Insert New Category</a></li>
             <li><a href="OrderFilter.php">View Orders</a>
+            <li><a href="ViewProduct.php">View Products</a>
             </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -148,9 +159,6 @@ if (isset($_POST['submit'])) {
 
 
 
-
-
-
 <!-- show contents of Category table -->
 <div class="row">
     <div class="col-xs-12">
@@ -179,6 +187,11 @@ if (isset($_POST['submit'])) {
         echo "\n <tr>";
         echo "<td>" . $row['CategoryID'] . "</td>";
         echo "<td>" . $row['CategoryName'] . "</td>";
+        
+        
+        //echo "<td><a href='UpdateCategory.php?CategoryID=" . $row['CategoryID'] . "'>update</a></td>";
+        // link to delete record
+        echo "<td><a href='DeleteCategory.php?CategoryID=" . $row['CategoryID']  .  "'>delete</a></td>";
         echo "</tr> \n";
     }
 ?>        

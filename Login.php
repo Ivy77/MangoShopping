@@ -75,7 +75,7 @@ if (isset($_POST['submit'])) {
     }
     
     // get the hashed password from the user with the email that got entered
-    $query = "SELECT hashedpass FROM users WHERE email='" . $email . "';";
+    $query = "SELECT hashedpass FROM Administrator WHERE email='" . $email . "';";
     $result = queryDB($query, $db);
     if (nTuples($result) > 0) {
         // there is an account that corresponds to the email that the user entered
@@ -90,7 +90,7 @@ if (isset($_POST['submit'])) {
 			// start a session
 			if (session_start()) {
 				$_SESSION['email'] = $email;
-				header('Location: InputProduct1.php');
+				header('Location: InsertProduct1.php');
 				exit;
 			} else {
 				// if we can't start a session
